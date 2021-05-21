@@ -1,0 +1,25 @@
+FROM golang:1.12-alpine
+
+RUN apk add --no-cache git
+
+# Set the Current Working Directory inside the container
+WORKDIR /src/
+
+# We want to populate the module cache based on the go.{mod,sum} files.
+# COPY go.mod .
+# COPY go.sum .
+COPY main.go go.* /src/
+
+RUN go mod download
+
+COPY . .
+
+# Build the Go app
+RUN go build -o ./out/go-for-docker .
+
+
+# This container exposes port 8080 to the outside world
+EXPOSE 8000
+
+# Run the binary program produced by `go install`
+CMD ["./out/go-for-docker"]
